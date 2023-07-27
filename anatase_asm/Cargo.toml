@@ -1,0 +1,13 @@
+[package]
+name = "anatase-asm"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+casey = "*"
+colored = "*"
+
+archiver = { path = "../crates/archiver" }
+istd = { git = "https://github.com/rookieCookies/istd" }

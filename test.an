@@ -1,0 +1,56 @@
+-- function with 1 argument
+-- 0th register is return value
+-- 1st is the argument n
+-- the entry point of the function is "$entry"
+fn fib ~ 1 $entry 
+	 $entry
+	 	push 6 -- space for 6 values
+	 	set @2 0.0 -- a
+	 	set @3 1.0 -- b
+	 	set @4 0.0 -- i
+		set @6 1.0
+
+	$loop-cond
+		ltf @5 @4 @1 -- i < n
+		jif @5 $loop-body $end
+		
+	$loop-body
+		-- we can override @5 since it's 
+		-- just used for the condition
+		addf @5 @2 @3 -- a + b
+		cpy @2 @3
+		cpy @3 @5
+		addf @4 @4 @6
+		jmp $loop-cond
+
+	$end
+		cpy @0 @2
+		pop 7
+		ret
+
+fn main ~ 0 $entry 
+ 	$entry
+		push 4
+		set @1 3.0 -- i
+		set @2 0.0 -- cache
+		jmp $loop-cond
+
+	$loop-cond
+		set @4 1.0
+		addf @1 @1 @4
+		call @4 fib @1 -- fib(i+1)
+		
+		nef @4 @2 @4
+		cpy @2 @4
+		
+		jif @4 $loop-cond $end
+
+	$loop-body
+		cpy @2 @3
+		jmp $loop-cond
+
+	$end
+		-- return n
+		cpy @0 @1
+		pop 4
+		ret

@@ -1,0 +1,8 @@
+[workspace]
+members = [
+  "anatase",
+  "anatase_asm",
+  "crates/archiver",
+]
+
+resolver = "1"
