@@ -1,8 +1,8 @@
 #![feature(iter_next_chunk)]
 
-use std::{time::Instant, mem::size_of, env};
+use std::{time::Instant, mem::size_of, env, sync::Arc, cell::Cell};
 
-use anatase::{VM, Stack, Code, Data};
+use anatase::{VM, Stack, Code, Data, garbage_collector::{MemoryPool, Object, GarbageCollector, SendPtr, ObjectData}};
 use archiver::Packed;
 
 fn main() {
@@ -14,7 +14,7 @@ fn main() {
     let constants = data.pop().unwrap();
     let constants = parse_constants(&constants.0);
 
-    let mut vm = VM::<false> {
+    let mut vm = VM::<true> {
         stack: Stack::with_capacity(1_000_000 / size_of::<Data>()),
         callstack: Vec::with_capacity(128),
         current: Code::new(

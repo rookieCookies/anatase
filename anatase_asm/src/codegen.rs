@@ -54,6 +54,7 @@ pub fn codegen(symbol_map: &SymbolMap, functions: &[Function]) -> (Vec<Literal>,
                     crate::OperatorKind::Ret() => bytecode.push(Ret),
 
                     
+                    | crate::OperatorKind::Print(v)
                     | crate::OperatorKind::Push(v)
                     | crate::OperatorKind::Pop(v) => {
                         v.to_bytes(&mut bytecode);
@@ -115,6 +116,19 @@ pub fn codegen(symbol_map: &SymbolMap, functions: &[Function]) -> (Vec<Literal>,
                     },
 
                     
+                    | crate::OperatorKind::IJNif(reg, _)
+                    | crate::OperatorKind::IJif(reg, _)
+                     => {
+                        reg.to_bytes(&mut bytecode);
+                        jumps.push((o.kind.clone(), bytecode.len()));
+                        bytecode.push(0);
+                        bytecode.push(0);
+                        bytecode.push(0);
+                        bytecode.push(0);
+                    },
+
+                    
+        
                     crate::OperatorKind::Call(dst, func, ref args) => {
                         dst.to_bytes(&mut bytecode);
 
@@ -162,6 +176,10 @@ pub fn codegen(symbol_map: &SymbolMap, functions: &[Function]) -> (Vec<Literal>,
                     | crate::OperatorKind::RemI (v1, v2, v3)
                     | crate::OperatorKind::RemU (v1, v2, v3)
                     | crate::OperatorKind::RemF (v1, v2, v3)
+                    | crate::OperatorKind::LsI  (v1, v2, v3)
+                    | crate::OperatorKind::LsU  (v1, v2, v3)
+                    | crate::OperatorKind::RsI  (v1, v2, v3)
+                    | crate::OperatorKind::RsU  (v1, v2, v3)
                      => {
                         v1.to_bytes(&mut bytecode);
                         v2.to_bytes(&mut bytecode);
@@ -196,7 +214,9 @@ pub fn codegen(symbol_map: &SymbolMap, functions: &[Function]) -> (Vec<Literal>,
                 },
 
 
-                crate::OperatorKind::Jmp(v) => {
+                | crate::OperatorKind::IJif(_, v)
+                | crate::OperatorKind::IJNif(_, v)
+                | crate::OperatorKind::Jmp(v) => {
                     println!("{}", symbol_map.get(v.0));
                     let index = block_starts.get(&v).unwrap();
                     let index = u32::try_from(*index).expect("index too big");
@@ -206,7 +226,6 @@ pub fn codegen(symbol_map: &SymbolMap, functions: &[Function]) -> (Vec<Literal>,
                     bytecode[j.1 + 1] = index[1];
                     bytecode[j.1 + 2] = index[2];
                     bytecode[j.1 + 3] = index[3];
-
                 }
 
                 _ => unreachable!()

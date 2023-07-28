@@ -2,6 +2,7 @@ use std::{fmt::Debug, mem::size_of, borrow::BorrowMut};
 
 mod runtime;
 mod bytecode;
+pub mod garbage_collector;
 
 
 #[derive(Debug)]
@@ -206,8 +207,8 @@ impl Debug for Data {
                 Self::TAG_I64 => write!(f, "int {:?}", self.inner.I64),
                 Self::TAG_U64 => write!(f, "uint {:?}", self.inner.U64),
                 Self::TAG_F64 => write!(f, "float {:?}", self.inner.F64),
-                Self::TAG_BOOL => writeln!(f, "bool {:?}", self.inner.Bool),
-                Self::TAG_UNINIT => writeln!(f, "uninit"),
+                Self::TAG_BOOL => write!(f, "bool {:?}", self.inner.Bool),
+                Self::TAG_UNINIT => write!(f, "uninit"),
                 _ => panic!("unexpected type {}", self.tag),
             }
         }

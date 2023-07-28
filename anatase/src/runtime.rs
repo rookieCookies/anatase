@@ -146,6 +146,13 @@ impl<const DEBUG: bool> VM<DEBUG> {
                 }
 
 
+                bytecode::PRINT => {
+                    let reg = self.current.next();
+                    let val = self.stack.reg(reg);
+                    println!("print: {val:?}");
+                }
+
+
                 bytecode::JIF => {
                     let cond = self.current.next();
                     let yes = self.current.read_as::<u32>();
@@ -159,6 +166,20 @@ impl<const DEBUG: bool> VM<DEBUG> {
                         self.current.jump(yes as usize);
                     } else {
                         self.current.jump(no as usize);
+                    }
+                }
+
+
+                bytecode::IJIF => {
+                    let cond = self.current.next();
+                    let yes = self.current.read_as::<u32>();
+
+                    let cond = self.stack.reg(cond);
+                    let cond = unsafe { cond.inner.Bool };
+                    
+
+                    if cond {
+                        self.current.jump(yes as usize);
                     }
                 }
 
@@ -179,6 +200,20 @@ impl<const DEBUG: bool> VM<DEBUG> {
                     }
                 }
 
+
+                bytecode::IJNIF => {
+                    let cond = self.current.next();
+                    let yes = self.current.read_as::<u32>();
+
+                    let cond = self.stack.reg(cond);
+                    let cond = unsafe { cond.inner.Bool };
+                    
+
+                    if !cond {
+                        self.current.jump(yes as usize);
+                    }
+                }
+                
 
                 bytecode::JMP => {
                     let pos = self.current.read_as::<u32>();
@@ -227,6 +262,10 @@ impl<const DEBUG: bool> VM<DEBUG> {
                 bytecode::REMI => arithmetic_operation!(%, TAG_I64, I64),
                 bytecode::REMU => arithmetic_operation!(%, TAG_U64, U64),
                 bytecode::REMF => arithmetic_operation!(%, TAG_F64, F64),
+                bytecode::LSI  => arithmetic_operation!(<<, TAG_I64, I64),
+                bytecode::LSU  => arithmetic_operation!(<<, TAG_U64, U64),
+                bytecode::RSI  => arithmetic_operation!(>>, TAG_I64, I64),
+                bytecode::RSU  => arithmetic_operation!(>>, TAG_U64, U64),
                 bytecode::DIVI => arithmetic_division_operation!(TAG_I64, I64,   0),
                 bytecode::DIVU => arithmetic_division_operation!(TAG_U64, U64,   0),
                 bytecode::DIVF => arithmetic_division_operation!(TAG_F64, F64, 0.0),

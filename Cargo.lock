@@ -13,6 +13,7 @@ name = "anatase"
 version = "0.1.0"
 dependencies = [
  "archiver",
+ "istd 0.1.0",
 ]
 
 [[package]]
@@ -22,7 +23,7 @@ dependencies = [
  "archiver",
  "casey",
  "colored",
- "istd",
+ "istd 0.1.0 (git+https://github.com/rookieCookies/istd)",
 ]
 
 [[package]]
@@ -126,6 +127,10 @@ dependencies = [
  "rustix",
  "windows-sys",
 ]
+
+[[package]]
+name = "istd"
+version = "0.1.0"
 
 [[package]]
 name = "istd"
